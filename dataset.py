@@ -20,7 +20,7 @@ class Dataset(Dataset):
         self.max_seq_len = model_config["max_seq_len"]
         self.batch_size = train_config["optimizer"]["batch_size"]
 
-        self.basename, self.speaker, self.text, self.raw_text, self.aux_data = self.process_meta(
+        self.basename, self.speaker, self.text, self.raw_text = self.process_meta(
             filename
         )
         with open(os.path.join(self.preprocessed_path, "speakers.json")) as f:

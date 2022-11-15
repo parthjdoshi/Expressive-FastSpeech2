@@ -42,14 +42,14 @@ class FastSpeech2(nn.Module):
 
         self.emotion_emb = None
         if model_config["multi_emotion"]:
-            with open(
-                os.path.join(
-                    preprocess_config["path"]["preprocessed_path"], "emotions.json"
-                ),
-                "r",
-            ) as f:
-                json_raw = json.load(f)
-                n_emotion = len(json_raw["emotion_dict"])
+#             with open(
+#                 os.path.join(
+#                     preprocess_config["path"]["preprocessed_path"], "emotions.json"
+#                 ),
+#                 "r",
+#             ) as f:
+#                 json_raw = json.load(f)
+                n_emotion = 5
             self.emotion_emb = nn.Embedding(
                 n_emotion,
                 model_config["transformer"]["encoder_hidden"],
