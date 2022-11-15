@@ -25,11 +25,11 @@ class Dataset(Dataset):
         )
         with open(os.path.join(self.preprocessed_path, "speakers.json")) as f:
             self.speaker_map = json.load(f)
-        with open(os.path.join(self.preprocessed_path, "emotions.json")) as f:
-            json_raw = json.load(f)
-            self.emotion_map = json_raw["emotion_dict"]
-            self.arousal_map = json_raw["arousal_dict"]
-            self.valence_map = json_raw["valence_dict"]
+#         with open(os.path.join(self.preprocessed_path, "emotions.json")) as f:
+#             json_raw = json.load(f)
+#             self.emotion_map = json_raw["emotion_dict"]
+#             self.arousal_map = json_raw["arousal_dict"]
+#             self.valence_map = json_raw["valence_dict"]
         self.sort = sort
         self.drop_last = drop_last
 
@@ -40,10 +40,27 @@ class Dataset(Dataset):
         basename = self.basename[idx]
         speaker = self.speaker[idx]
         speaker_id = self.speaker_map[speaker]
-        aux_data = self.aux_data[idx].split("|")
-        emotion = self.emotion_map[aux_data[-3]]
-        arousal = self.arousal_map[aux_data[-2]]
-        valence = self.valence_map[aux_data[-1]]
+#         aux_data = self.aux_data[idx].split("|")
+#         emotion = self.emotion_map[aux_data[-3]]
+#         arousal = self.arousal_map[aux_data[-2]]
+#         valence = self.valence_map[aux_data[-1]]
+        file_id = int(basename.split('_')[-1])
+        emotion = -1
+        # neutral
+        if file_id <= 350:
+            emotion = 0
+        # Angry
+        elif file_id <= 700:
+            emotion = 1
+        # Happy
+        elif file_id <= 1050:
+            emotion = 2
+        # Sad
+        elif file_id <= 1400:
+            emotion = 3
+        # Surprise
+        else:
+            emotion = 4
         raw_text = self.raw_text[idx]
         phone = np.array(text_to_sequence(self.text[idx], self.cleaners))
         mel_path = os.path.join(
@@ -75,8 +92,8 @@ class Dataset(Dataset):
             "id": basename,
             "speaker": speaker_id,
             "emotion": emotion,
-            "arousal": arousal,
-            "valence": valence,
+#             "arousal": arousal,
+#             "valence": valence,
             "text": phone,
             "raw_text": raw_text,
             "mel": mel,
@@ -95,7 +112,7 @@ class Dataset(Dataset):
             speaker = []
             text = []
             raw_text = []
-            aux_data = []
+#             aux_data = []
             for line in tqdm(f.readlines()):
                 line_split = line.strip("\n").split("|")
                 n, s, t, r = line_split[:4]
@@ -107,20 +124,20 @@ class Dataset(Dataset):
                 mel = np.load(mel_path)
                 if mel.shape[0] > self.max_seq_len:
                     continue
-                a = "|".join(line_split[4:])
+#                 a = "|".join(line_split[4:])
                 name.append(n)
                 speaker.append(s)
                 text.append(t)
                 raw_text.append(r)
-                aux_data.append(a)
-            return name, speaker, text, raw_text, aux_data
+#                 aux_data.append(a)
+            return name, speaker, text, raw_text, #aux_data
 
     def reprocess(self, data, idxs):
         ids = [data[idx]["id"] for idx in idxs]
         speakers = [data[idx]["speaker"] for idx in idxs]
         emotions = [data[idx]["emotion"] for idx in idxs]
-        arousals = [data[idx]["arousal"] for idx in idxs]
-        valences = [data[idx]["valence"] for idx in idxs]
+#         arousals = [data[idx]["arousal"] for idx in idxs]
+#         valences = [data[idx]["valence"] for idx in idxs]
         texts = [data[idx]["text"] for idx in idxs]
         raw_texts = [data[idx]["raw_text"] for idx in idxs]
         mels = [data[idx]["mel"] for idx in idxs]
@@ -133,8 +150,8 @@ class Dataset(Dataset):
 
         speakers = np.array(speakers)
         emotions = np.array(emotions)
-        arousals = np.array(arousals)
-        valences = np.array(valences)
+#         arousals = np.array(arousals)
+#         valences = np.array(valences)
         texts = pad_1D(texts)
         mels = pad_2D(mels)
         pitches = pad_1D(pitches)
@@ -146,8 +163,8 @@ class Dataset(Dataset):
             raw_texts,
             speakers,
             emotions,
-            arousals,
-            valences,
+#             arousals,
+#             valences,
             texts,
             text_lens,
             max(text_lens),
