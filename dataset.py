@@ -45,6 +45,7 @@ class Dataset(Dataset):
 #         arousal = self.arousal_map[aux_data[-2]]
 #         valence = self.valence_map[aux_data[-1]]
         file_id = int(basename.split('_')[-1])
+#         print(file_id)
         emotion = -1
         # neutral
         if file_id <= 350:

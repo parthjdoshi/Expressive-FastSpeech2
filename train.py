@@ -36,6 +36,11 @@ def main(args, configs):
         shuffle=True,
         collate_fn=dataset.collate_fn,
     )
+    
+#     print("#"*20)
+#     print(len(loader))
+#     for batches in loader:
+#         print(batch)
 
     # Prepare model
     model, optimizer = get_model(args, configs, device, train=True)

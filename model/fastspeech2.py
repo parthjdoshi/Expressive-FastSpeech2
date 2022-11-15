@@ -49,7 +49,7 @@ class FastSpeech2(nn.Module):
 #                 "r",
 #             ) as f:
 #                 json_raw = json.load(f)
-                n_emotion = 5
+            n_emotion = 5
             self.emotion_emb = nn.Embedding(
                 n_emotion,
                 model_config["transformer"]["encoder_hidden"],
@@ -59,8 +59,8 @@ class FastSpeech2(nn.Module):
         self,
         speakers,
         emotions,
-        arousals,
-        valences,
+#         arousals,
+#         valences,
         texts,
         src_lens,
         max_src_len,
