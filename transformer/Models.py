@@ -64,7 +64,7 @@ class Encoder(nn.Module):
         n_emotion = 5
         self.emotion_emb = nn.Embedding(
             n_emotion,
-            model_config["transformer"]["encoder_hidden"]  # Same as d_word_vec,
+            config["transformer"]["encoder_hidden"]  # Same as d_word_vec,
         )
 
         self.layer_stack = nn.ModuleList(
