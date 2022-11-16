@@ -60,6 +60,12 @@ class Encoder(nn.Module):
             get_sinusoid_encoding_table(n_position, d_word_vec).unsqueeze(0),
             requires_grad=False,
         )
+        
+        n_emotion = 5
+        self.emotion_emb = nn.Embedding(
+            n_emotion,
+            model_config["transformer"]["encoder_hidden"]  # Same as d_word_vec,
+        )
 
         self.layer_stack = nn.ModuleList(
             [
@@ -70,7 +76,7 @@ class Encoder(nn.Module):
             ]
         )
 
-    def forward(self, src_seq, mask, return_attns=False):
+    def forward(self, src_seq, mask, emotions, return_attns=False):
 
         enc_slf_attn_list = []
         batch_size, max_len = src_seq.shape[0], src_seq.shape[1]
@@ -89,6 +95,8 @@ class Encoder(nn.Module):
             enc_output = self.src_word_emb(src_seq) + self.position_enc[
                 :, :max_len, :
             ].expand(batch_size, -1, -1)
+            
+        enc_output = enc_output + self.emotion_emb(emotions).unsqueeze(1).expand(-1, enc_output.shape[1], -1)
 
         for enc_layer in self.layer_stack:
             enc_output, enc_slf_attn = enc_layer(

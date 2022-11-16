@@ -41,19 +41,19 @@ class FastSpeech2(nn.Module):
             )
 
         self.emotion_emb = None
-        if model_config["multi_emotion"]:
-#             with open(
-#                 os.path.join(
-#                     preprocess_config["path"]["preprocessed_path"], "emotions.json"
-#                 ),
-#                 "r",
-#             ) as f:
-#                 json_raw = json.load(f)
-            n_emotion = 5
-            self.emotion_emb = nn.Embedding(
-                n_emotion,
-                model_config["transformer"]["encoder_hidden"],
-            )
+#         if model_config["multi_emotion"]:
+# #             with open(
+# #                 os.path.join(
+# #                     preprocess_config["path"]["preprocessed_path"], "emotions.json"
+# #                 ),
+# #                 "r",
+# #             ) as f:
+# #                 json_raw = json.load(f)
+#             n_emotion = 5
+#             self.emotion_emb = nn.Embedding(
+#                 n_emotion,
+#                 model_config["transformer"]["encoder_hidden"],
+#             )
 
     def forward(
         self,
@@ -81,17 +81,17 @@ class FastSpeech2(nn.Module):
             else None
         )
 
-        output = self.encoder(texts, src_masks)
+        output = self.encoder(texts, src_masks, emotions)
 
         if self.speaker_emb is not None:
             output = output + self.speaker_emb(speakers).unsqueeze(1).expand(
                 -1, max_src_len, -1
             )
 
-        if self.emotion_emb is not None:
-            output = output + self.emotion_emb(emotions).unsqueeze(1).expand(
-                -1, max_src_len, -1
-            )
+#         if self.emotion_emb is not None:
+#             output = output + self.emotion_emb(emotions).unsqueeze(1).expand(
+#                 -1, max_src_len, -1
+#             )
 
         (
             output,
