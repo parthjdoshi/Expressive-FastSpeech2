@@ -14,7 +14,7 @@ from utils.model import get_model, get_vocoder
 from utils.tools import to_device, synth_samples
 from dataset import TextDataset
 from text import text_to_sequence
-from text.korean import tokenize, normalize_nonchar
+#from text.korean import tokenize, normalize_nonchar
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -31,30 +31,30 @@ def read_lexicon(lex_path):
     return lexicon
 
 
-def preprocess_korean(text, preprocess_config):
-    lexicon = read_lexicon(preprocess_config["path"]["lexicon_path"])
-
-    phones = []
-    words = filter(None, re.split(r"([,;.\-\?\!\s+])", text))
-    for w in words:
-        if w in lexicon:
-            phones += lexicon[w]
-        else:
-            phones += list(filter(lambda p: p != " ", tokenize(w, norm=False)))
-    phones = "{" + "}{".join(phones) + "}"
-    phones = normalize_nonchar(phones, inference=True)
-    phones = phones.replace("}{", " ")
-
-    print("Raw Text Sequence: {}".format(text))
-    print("Phoneme Sequence: {}".format(phones))
-    sequence = np.array(
-        text_to_sequence(
-            phones, preprocess_config["preprocessing"]["text"]["text_cleaners"]
-        )
-    )
-
-    return np.array(sequence)
-
+#def preprocess_korean(text, preprocess_config):
+#    lexicon = read_lexicon(preprocess_config["path"]["lexicon_path"])
+#
+#    phones = []
+#    words = filter(None, re.split(r"([,;.\-\?\!\s+])", text))
+#    for w in words:
+#        if w in lexicon:
+#            phones += lexicon[w]
+#        else:
+#            phones += list(filter(lambda p: p != " ", tokenize(w, norm=False)))
+#    phones = "{" + "}{".join(phones) + "}"
+#    phones = normalize_nonchar(phones, inference=True)
+#    phones = phones.replace("}{", " ")
+#
+#    print("Raw Text Sequence: {}".format(text))
+#    print("Phoneme Sequence: {}".format(phones))
+#    sequence = np.array(
+#        text_to_sequence(
+#            phones, preprocess_config["preprocessing"]["text"]["text_cleaners"]
+#        )
+#    )
+#
+#    return np.array(sequence)
+#
 
 def preprocess_english(text, preprocess_config):
     text = text.rstrip(punctuation)
@@ -225,20 +225,22 @@ if __name__ == "__main__":
             speaker_map = json.load(f)
         speakers = np.array([speaker_map[args.speaker_id]])
         if model_config["multi_emotion"]:
-            with open(os.path.join(preprocess_config["path"]["preprocessed_path"], "emotions.json")) as f:
-                json_raw = json.load(f)
-                emotion_map = json_raw["emotion_dict"]
-                arousal_map = json_raw["arousal_dict"]
-                valence_map = json_raw["valence_dict"]
-            emotions = np.array([emotion_map[args.emotion_id]])
-            arousals = np.array([arousal_map[args.arousal]])
-            valences = np.array([valence_map[args.valence]])
+            emotions = np.array([int(args.emotion_id)])
+#            with open(os.path.join(preprocess_config["path"]["preprocessed_path"], "emotions.json")) as f:
+#                json_raw = json.load(f)
+#                emotion_map = json_raw["emotion_dict"]
+#                arousal_map = json_raw["arousal_dict"]
+#                valence_map = json_raw["valence_dict"]
+#            emotions = np.array([emotion_map[args.emotion_id]])
+#            arousals = np.array([arousal_map[args.arousal]])
+#            valences = np.array([valence_map[args.valence]])
         if preprocess_config["preprocessing"]["text"]["language"] == "kr":
-            texts = np.array([preprocess_korean(args.text, preprocess_config)])
+            pass
+#            texts = np.array([preprocess_korean(args.text, preprocess_config)])
         elif preprocess_config["preprocessing"]["text"]["language"] == "en":
             texts = np.array([preprocess_english(args.text, preprocess_config)])
         text_lens = np.array([len(texts[0])])
-        batchs = [(ids, raw_texts, speakers, emotions, arousals, valences, texts, text_lens, max(text_lens))]
+        batchs = [(ids, raw_texts, speakers, emotions, texts, text_lens, max(text_lens))]
         tag = f"{args.speaker_id}_{args.emotion_id}"
 
     control_values = args.pitch_control, args.energy_control, args.duration_control
